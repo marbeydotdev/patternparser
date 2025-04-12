@@ -1,3 +1,5 @@
+// taken from https://github.com/elgs/splitargs but slightly modified for typescript. it was a pain to try and work with the original sorry
+
 export function splitArgs (input: string, sep: string | undefined = undefined, keepQuotes: boolean = false) {
     const separator = sep || /\s/g;
     let singleQuoteOpen = false;
