@@ -1,13 +1,14 @@
 import {splitArgs} from "./splitargsNotDeprecated";
-import {Command, Parser} from "../types";
-import {parsers} from "./parsers";
+import {Command, Parser} from "./types";
+import {defaultParsers} from "./defaultParsers";
+import {CommandNotFoundError, UnknownParserTypeError, WrongTypeError} from "./errors";
 
 export class CommandParser {
-    private typeParsers: Parser[] = parsers;
+    private typeParsers: Parser[] = defaultParsers;
     private commands: (Command & ReturnType<typeof getArgs>)[] = [];
 
     constructor(additionalParsers: Parser[] = []) {
-        this.typeParsers = [...parsers, ...additionalParsers];
+        this.typeParsers = [...defaultParsers, ...additionalParsers];
     }
 
     public addCommand(command: Command) {
@@ -22,7 +23,7 @@ export class CommandParser {
 
         const parser = this.typeParsers.find(p => p.name == type);
         if (!parser){
-            throw new Error("command pattern contains unknown type: " + type);
+            throw new UnknownParserTypeError(type)
         }
 
         if (!parser.checker(input)){
@@ -55,7 +56,7 @@ export class CommandParser {
         const args = splitArgs(input)
         const command = this.getCommand(args)
         if (!command){
-            throw new Error("Could not process input; no matching command found")
+            throw new CommandNotFoundError(input)
         }
 
         const varArgsTyped: Object[] = []
@@ -64,7 +65,7 @@ export class CommandParser {
             const arg = command.varArgs[varArg]!;
             const type = await this.getAsType(args[varArg], arg.type)
             if (!type && !arg.optional){
-                throw new Error("Wrong type supplied for argument with type"+arg.type)
+                throw new WrongTypeError(command.pattern, args[varArg], arg.name, arg.type)
             }
             varArgsTyped.push(type!)
         }

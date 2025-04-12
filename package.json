@@ -1,10 +1,18 @@
 {
-  "name": "patternparser",
-  "version": "1.0.0",
+  "name": "@marbey/patternparser",
+  "version": "1.0.1",
   "scripts": {
     "build": "tsc"
   },
-  "keywords": ["cli", "parsing", "parser", "command", "typescript"],
+  "keywords": [
+    "cli",
+    "parsing",
+    "parser",
+    "command",
+    "typescript"
+  ],
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "author": "Zavid van den Worm",
   "license": "MIT",
   "description": "A command parser with an incredibly simple setup.",
@@ -13,5 +21,14 @@
   },
   "devDependencies": {
     "@types/validator": "^13.12.3"
-  }
+  },
+  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marbeydotdev/patternparser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marbeydotdev/patternparser/issues"
+  },
+  "homepage": "https://github.com/marbeydotdev/patternparser#readme"
 }
