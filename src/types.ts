@@ -1,6 +1,9 @@
+import {Constraint} from "./constraints";
+
 export type Command = {
     pattern: string,
-    handle: Function
+    handle: Function,
+    constraints?: {[argName: string]: Constraint[]},
 }
 
 export type Parser = {

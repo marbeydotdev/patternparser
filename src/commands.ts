@@ -1,7 +1,7 @@
 import {splitArgs} from "./splitargsNotDeprecated";
 import {Command, Parser} from "./types";
 import {defaultParsers} from "./defaultParsers";
-import {CommandNotFoundError, UnknownParserTypeError, WrongTypeError} from "./errors";
+import {CommandNotFoundError, ConstraintError, UnknownParserTypeError, WrongTypeError} from "./errors";
 
 export class CommandParser {
     private typeParsers: Parser[] = defaultParsers;
@@ -27,7 +27,7 @@ export class CommandParser {
         }
 
         if (!parser.checker(input)){
-            return null
+            throw new WrongTypeError(input, type)
         }
 
         return parser.ensurer(input);
@@ -52,6 +52,23 @@ export class CommandParser {
         return null
     }
 
+    private verifyConstraints(argName: string, argValue: Object, constraints: Command['constraints']) {
+        if (!constraints){
+            return;
+        }
+
+        const argConstraints = constraints[argName];
+        if (!argConstraints){
+            return;
+        }
+
+        for (let constraint of argConstraints){
+            if (!constraint.check(argValue)){
+                throw new ConstraintError(constraint, argValue);
+            }
+        }
+    }
+
     public async process(input: string){
         const args = splitArgs(input)
         const command = this.getCommand(args)
@@ -65,8 +82,12 @@ export class CommandParser {
             const arg = command.varArgs[varArg]!;
             const type = await this.getAsType(args[varArg], arg.type)
             if (!type && !arg.optional){
-                throw new WrongTypeError(command.pattern, args[varArg], arg.name, arg.type)
+                throw new WrongTypeError(args[varArg], arg.type)
             }
+            if (arg.optional){
+                continue;
+            }
+            this.verifyConstraints(arg.name, type!, command.constraints)
             varArgsTyped.push(type!)
         }
 

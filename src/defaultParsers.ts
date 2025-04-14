@@ -9,7 +9,7 @@ export const defaultParsers: Parser[] = [
     },
     {
         name: "int",
-        checker: input => validator.isInt(input),
+        checker: input => !Number.isNaN(Number(input)),
         ensurer: input => validator.toInt(input)
     },
     {
