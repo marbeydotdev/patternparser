@@ -16,7 +16,7 @@ Install patternparser with npm
 ## Usage/Examples
 
 ```typescript
-import {CommandParser} from "@marbey/patternparser";
+import {CommandParser, RangeConstraint} from "@marbey/patternparser";
 
 const processor = new CommandParser();
 
@@ -24,15 +24,28 @@ processor.addCommand({
     pattern: "use [itemName:string] [quantity:int]",
     handle: (itemName: string, quantity: number) => {
         console.log(`You used ${quantity} of your ${itemName}s.`);
+    },
+    constraints: {
+        "quantity": [
+            new RangeConstraint(1, 5)
+        ]
     }
 })
 
 await processor.process("use apple 3")
 
 // You used 3 of your apples.
+
+await processor.process("use apple 6")
+
+
+
+// Constraint error, quantity above 5
 ```
 
 Parameters are automatically type-checked and validated. ```[itemName:string]``` will always be a string and ```[quantity:int]``` will always be an integer (and not a float).
+
+Constraints are optional and can offer additional validation.
 
 ## Adding custom argument parsers
 
@@ -41,7 +54,7 @@ To add a custom parser, you simply create a Parser object and pass it to the Com
 ```typescript
 import {CommandParser, Parser} from "@marbey/patternparser";
 
-type VeryCustomUser = {
+interface VeryCustomUser {
     userName: string;
 }
 
